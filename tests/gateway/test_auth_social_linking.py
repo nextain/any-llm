@@ -51,6 +51,48 @@ def test_social_login_links_same_email_across_providers(
     assert discord_user_id == google_user_id
 
 
+def test_lookup_returns_linked_accounts(
+    client: TestClient,
+    master_key_header: dict[str, str],
+) -> None:
+    """Google + Discord 같은 email → lookup 시 linked_accounts에 둘 다 포함."""
+    email = "linked@example.com"
+    _social_login(client, "google", email, "google-linked-1")
+    _social_login(client, "discord", email, "discord-linked-1")
+
+    resp = client.get(
+        "/v1/auth/lookup",
+        params={"provider": "google", "email": email},
+        headers=master_key_header,
+    )
+    assert resp.status_code == 200
+    data = resp.json()
+    assert data["linked_accounts"] is not None
+    assert data["linked_accounts"]["discord"] == "discord-linked-1"
+    assert data["linked_accounts"]["google"] == "google-linked-1"
+
+
+def test_lookup_returns_no_linked_accounts_for_single_provider(
+    client: TestClient,
+    master_key_header: dict[str, str],
+) -> None:
+    """단일 프로바이더만 로그인 → linked_accounts에 해당 프로바이더만."""
+    email = "single@example.com"
+    _social_login(client, "google", email, "google-single-1")
+
+    resp = client.get(
+        "/v1/auth/lookup",
+        params={"provider": "google", "email": email},
+        headers=master_key_header,
+    )
+    assert resp.status_code == 200
+    data = resp.json()
+    # google만 linked — discord 키 없음
+    linked = data.get("linked_accounts")
+    if linked:
+        assert "discord" not in linked
+
+
 def test_social_login_keeps_separate_users_for_different_emails(
     client: TestClient,
     master_key_header: dict[str, str],

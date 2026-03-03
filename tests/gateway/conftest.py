@@ -85,6 +85,8 @@ def client(test_config: GatewayConfig) -> Generator[TestClient]:
 
     _run_alembic_migrations(test_config.database_url)
     engine = create_engine(test_config.database_url, pool_pre_ping=True)
+    # Create tables not covered by Alembic (e.g. billing_plans from caret_models)
+    Base.metadata.create_all(bind=engine, checkfirst=True)
     app = create_app(test_config)
 
     def override_get_db() -> Generator[Session]:

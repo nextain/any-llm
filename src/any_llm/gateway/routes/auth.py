@@ -673,6 +673,7 @@ class LookupResponse(BaseModel):
     email: str | None = None
     name: str | None = None
     avatar_url: str | None = None
+    linked_accounts: dict[str, str] | None = None
 
 
 @router.get("/lookup")
@@ -734,6 +735,12 @@ async def lookup_user(
     if not caret_user:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
 
+    linked_accounts: dict[str, str] | None = None
+    if isinstance(caret_user.metadata_, dict):
+        raw = caret_user.metadata_.get("linked_accounts")
+        if isinstance(raw, dict):
+            linked_accounts = {k: v for k, v in raw.items() if isinstance(k, str) and isinstance(v, str)}
+
     return LookupResponse(
         user_id=caret_user.user_id,
         alias=caret_user.name,
@@ -742,4 +749,5 @@ async def lookup_user(
         email=caret_user.email,
         name=caret_user.name,
         avatar_url=caret_user.avatar_url,
+        linked_accounts=linked_accounts or None,
     )
