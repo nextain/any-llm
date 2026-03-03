@@ -27,6 +27,7 @@ class UserResponse(BaseModel):
 
     user_id: str
     alias: str | None
+    email: str | None = None
     spend: float
     budget_id: str | None
     budget_started_at: str | None
@@ -35,6 +36,7 @@ class UserResponse(BaseModel):
     created_at: str
     updated_at: str
     metadata: dict[str, Any]
+    linked_accounts: dict[str, str] | None = None
 
 
 class UpdateUserRequest(BaseModel):
@@ -102,9 +104,17 @@ async def create_user(
     db.commit()
     db.refresh(user)
 
+    return _user_to_response(user)
+
+
+def _user_to_response(user: User) -> UserResponse:
+    """Convert a User ORM object to UserResponse."""
+    meta = dict(user.metadata_) if user.metadata_ else {}
+    linked = meta.get("linked_accounts") if isinstance(meta, dict) else None
     return UserResponse(
         user_id=user.user_id,
         alias=user.alias,
+        email=user.email,
         spend=float(user.spend),
         budget_id=user.budget_id,
         budget_started_at=user.budget_started_at.isoformat() if user.budget_started_at else None,
@@ -112,7 +122,8 @@ async def create_user(
         blocked=bool(user.blocked),
         created_at=user.created_at.isoformat(),
         updated_at=user.updated_at.isoformat(),
-        metadata=dict(user.metadata_) if user.metadata_ else {},
+        metadata=meta,
+        linked_accounts=linked if isinstance(linked, dict) else None,
     )
 
 
@@ -125,21 +136,7 @@ async def list_users(
     """List all users with pagination."""
     users = db.query(User).offset(skip).limit(limit).all()
 
-    return [
-        UserResponse(
-            user_id=user.user_id,
-            alias=user.alias,
-            spend=float(user.spend),
-            budget_id=user.budget_id,
-            budget_started_at=user.budget_started_at.isoformat() if user.budget_started_at else None,
-            next_budget_reset_at=user.next_budget_reset_at.isoformat() if user.next_budget_reset_at else None,
-            blocked=bool(user.blocked),
-            created_at=user.created_at.isoformat(),
-            updated_at=user.updated_at.isoformat(),
-            metadata=dict(user.metadata_) if user.metadata_ else {},
-        )
-        for user in users
-    ]
+    return [_user_to_response(user) for user in users]
 
 
 @router.get("/{user_id}", dependencies=[Depends(verify_master_key)])
@@ -156,18 +153,7 @@ async def get_user(
             detail=f"User with id '{user_id}' not found",
         )
 
-    return UserResponse(
-        user_id=user.user_id,
-        alias=user.alias,
-        spend=float(user.spend),
-        budget_id=user.budget_id,
-        budget_started_at=user.budget_started_at.isoformat() if user.budget_started_at else None,
-        next_budget_reset_at=user.next_budget_reset_at.isoformat() if user.next_budget_reset_at else None,
-        blocked=bool(user.blocked),
-        created_at=user.created_at.isoformat(),
-        updated_at=user.updated_at.isoformat(),
-        metadata=dict(user.metadata_) if user.metadata_ else {},
-    )
+    return _user_to_response(user)
 
 
 @router.patch("/{user_id}", dependencies=[Depends(verify_master_key)])
