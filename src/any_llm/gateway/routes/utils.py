@@ -16,7 +16,7 @@ from any_llm.gateway.db import (
 )
 from any_llm.gateway.log_config import logger
 
-CREDITS_PER_USD_DEFAULT = 10.0
+CREDITS_PER_USD_DEFAULT = 1000.0
 
 
 def _get_cached_prompt_tokens(usage: Any) -> int | None:

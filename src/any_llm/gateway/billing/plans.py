@@ -4,17 +4,17 @@ Keep in sync with pricing page (naia.nextain.io/pricing).
 """
 
 # ── FREE plan ────────────────────────────────────────────────
-FREE_SIGNUP_BONUS_CREDITS = 5.0      # One-time bonus on first join (BONUS pool, no expiry)
-FREE_MONTHLY_CREDITS = 3.0           # Monthly top-up if balance < this value
+FREE_SIGNUP_BONUS_CREDITS = 500.0    # One-time bonus on first join (BONUS pool, no expiry)
+FREE_MONTHLY_CREDITS = 300.0         # Monthly top-up if balance < this value
 FREE_RENEW_INTERVAL_DAYS = 30
-FREE_CREDITS_PER_USD = 10.0
+FREE_CREDITS_PER_USD = 1000.0
 
 # ── BASIC plan ($10/mo) ─────────────────────────────────────
-BASIC_MONTHLY_CREDITS = 100.0
+BASIC_MONTHLY_CREDITS = 10000.0
 BASIC_ADD_AMOUNT_USD = 10.0
 BASIC_PRICE_USD = 10.0
 BASIC_RENEW_INTERVAL_DAYS = 30
-BASIC_CREDITS_PER_USD = 10.0
+BASIC_CREDITS_PER_USD = 1000.0
 
 # ── Seed data for BillingPlan table ─────────────────────────
 PLAN_SEEDS = [

@@ -31,7 +31,7 @@ def renew_subscriptions(db: Session) -> int:
 
     Renewal behavior depends on plan type:
     - FREE plans (price_usd == 0): top-up only if balance < monthly_credits
-      (e.g. balance < 3 → fill to 3, not add 3)
+      (e.g. balance < 300 → fill to 300, not add 300)
     - Paid plans: unconditionally add monthly_credits
 
     For each due subscription:
