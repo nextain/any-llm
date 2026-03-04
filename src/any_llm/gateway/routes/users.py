@@ -111,10 +111,11 @@ def _user_to_response(user: User) -> UserResponse:
     """Convert a User ORM object to UserResponse."""
     meta = dict(user.metadata_) if user.metadata_ else {}
     linked = meta.get("linked_accounts") if isinstance(meta, dict) else None
+    email = user.caret_user.email if user.caret_user else None
     return UserResponse(
         user_id=user.user_id,
         alias=user.alias,
-        email=user.email,
+        email=email,
         spend=float(user.spend),
         budget_id=user.budget_id,
         budget_started_at=user.budget_started_at.isoformat() if user.budget_started_at else None,
