@@ -298,9 +298,9 @@ def jwt_exp(token: str) -> int:
 def _ensure_free_plan_and_balance(db: Session, user_id: str, now: datetime) -> None:
     """Seed FREE plan subscription and signup bonus for new users.
 
-    Matching careti.ai FREE plan:
-    - Signup: 5 credits instantly (BONUS pool, no expiry)
-    - Monthly: 3 credits auto-top-up if balance < 3 (handled by renewal cron)
+    Values come from billing.plans constants (single source of truth):
+    - Signup: FREE_SIGNUP_BONUS_CREDITS (BONUS pool, no expiry)
+    - Monthly: FREE_MONTHLY_CREDITS auto-top-up if balance < threshold (renewal cron)
     """
     plan = (
         db.query(BillingPlan)
@@ -320,7 +320,7 @@ def _ensure_free_plan_and_balance(db: Session, user_id: str, now: datetime) -> N
     )
     db.add(subscription)
 
-    # Signup bonus: 20 credits (monthly_bonus_credits), no expiry
+    # Signup bonus (monthly_bonus_credits from plan seed), no expiry
     bonus_balance = CreditBalance(
         user_id=user_id,
         pool_type="BONUS",
