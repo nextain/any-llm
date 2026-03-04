@@ -309,8 +309,8 @@ async def live_proxy(ws: WebSocket):
 
                             um = getattr(resp, "usage_metadata", None)
                             if um:
-                                total_input_tokens = getattr(um, "prompt_token_count", 0) or 0
-                                total_output_tokens = getattr(um, "candidates_token_count", 0) or 0
+                                total_input_tokens += getattr(um, "prompt_token_count", 0) or 0
+                                total_output_tokens += getattr(um, "candidates_token_count", 0) or 0
                 except (WebSocketDisconnect, asyncio.CancelledError):
                     pass
                 except Exception as e:
