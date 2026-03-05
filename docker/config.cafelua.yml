@@ -1,0 +1,54 @@
+# Cafelua Gateway Configuration
+# Deployed on GCP Cloud Run (project-a8b18af5-b980-43e7-8ec, asia-northeast3)
+
+database_url: "${DATABASE_URL}"
+host: "0.0.0.0"
+port: 8080
+auto_migrate: true
+
+# Auth
+master_key: "${GATEWAY_MASTER_KEY}"
+jwt_secret: "${GATEWAY_JWT_SECRET}"
+access_token_exp_minutes: 60
+refresh_token_exp_days: 30
+auth_base_url: "${AUTH_BASE_URL:-https://naia.nextain.io}"
+
+# LLM Providers
+providers:
+  gemini:
+    api_key: "${GEMINI_API_KEY}"
+  xai:
+    api_key: "${XAI_API_KEY}"
+  anthropic:
+    api_key: "${ANTHROPIC_API_KEY}"
+  google_tts:
+    api_key: "${GOOGLE_TTS_API_KEY}"
+
+# Model Pricing (USD per million tokens)
+pricing:
+  "gemini:gemini-2.5-flash":
+    input_price_per_million: 0.15
+    output_price_per_million: 0.60
+    cached_price_per_million: 0.04
+  "gemini:gemini-2.5-pro":
+    input_price_per_million: 1.25
+    output_price_per_million: 10.0
+    cached_price_per_million: 0.31
+  "gemini:gemini-2.0-flash":
+    input_price_per_million: 0.10
+    output_price_per_million: 0.40
+    cached_price_per_million: 0.03
+  "xai:grok-3-mini":
+    input_price_per_million: 0.30
+    output_price_per_million: 0.50
+  "xai:grok-3":
+    input_price_per_million: 3.0
+    output_price_per_million: 15.0
+  "anthropic:claude-sonnet-4-5-20250929":
+    input_price_per_million: 3.0
+    output_price_per_million: 15.0
+    cached_price_per_million: 0.30
+  "anthropic:claude-haiku-4-5-20251001":
+    input_price_per_million: 0.80
+    output_price_per_million: 4.0
+    cached_price_per_million: 0.08
